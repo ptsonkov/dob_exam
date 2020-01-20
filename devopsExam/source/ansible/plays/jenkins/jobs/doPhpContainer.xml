@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?><project>
+  <actions/>
+  <description>Create phpnode container</description>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <org.jvnet.hudson.plugins.SSHBuilder plugin="ssh@2.5">
+      <siteName>vagrant@dhost.sulab.exam:22</siteName>
+      <command>echo -e "&gt;&gt;&gt; Check if phpnode container is running and stop it..."
+phpnode=`docker container ls -a | grep phpnode | wc -l`
+if [ "$phpnode" -eq "1" ]; then
+  docker container stop phpnode
+  docker container rm phpnode
+fi
+
+echo -e "&gt;&gt;&gt; Start new phpnode container..."
+cd /vagrant/dockerGitRepo/php
+sed -i 's/dob-mysql/dbnode/g' /vagrant/dockerGitRepo/site/index.php
+docker image build -t phpcontainer .
+docker container run -d --name phpnode -p 9000:9000 -v /vagrant/dockerGitRepo/site:/site --link dbnode:dbnode phpcontainer
+</command>
+      <execEachLine>false</execEachLine>
+    </org.jvnet.hudson.plugins.SSHBuilder>
+  </builders>
+  <publishers/>
+  <buildWrappers/>
+</project>

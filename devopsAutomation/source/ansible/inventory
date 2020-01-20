@@ -1,0 +1,39 @@
+ansible		ansible_host=10.10.10.11
+jenkins		ansible_host=10.10.10.12
+nagios		ansible_host=10.10.10.13
+docker		ansible_host=10.10.10.14
+
+[grp-ansible]
+ansible
+
+[grp-jenkins]
+jenkins
+
+[grp-nagios]
+nagios
+
+[grp-docker]
+docker
+
+[grp-ssh:children]
+grp-ansible
+grp-jenkins
+grp-nagios
+grp-docker
+
+[grp-linux:children]
+grp-ansible
+grp-jenkins
+grp-nagios
+grp-docker
+
+[grp-linux:vars]
+system_type='linux-server'
+
+[grp-httpd:children]
+grp-jenkins
+grp-nagios
+grp-docker
+
+[grp-db:children]
+grp-docker
